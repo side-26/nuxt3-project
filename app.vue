@@ -1,28 +1,65 @@
 <script setup lang="ts">
-import { Events } from 'vue';
-import { EventAttributes } from 'zhead';
+import { IBabyName, IButtonEvent, IBabiesName } from '@/config/types';
+import { BabySex, NameLength, NameType } from '@/config/enums';
+import { names } from '@/config/data';
 
-interface IbabyName {
-    sex: 'boys' | 'girls' | 'unisex';
-    type: 'unique' | 'trendy';
-    length: 'long' | 'all' | 'short';
-}
-const babyName = reactive<IbabyName>({
-    sex: 'boys',
-    type: 'unique',
-    length: 'all',
+const babyName = reactive<IBabyName>({
+    sex: BabySex.BOY,
+    type: NameType.TRENDY,
+    length: NameLength.ALL,
 });
-const handleChooseSex = (event: any) => {
-    babyName.sex = event.target?.innerText.toLowerCase();
+// set a interface for event
+const babiesName = ref<IBabiesName[]>([]);
+const handleChooseSex = (event: IButtonEvent) => {
+    const innerText = event?.target?.innerText.toLowerCase();
+    switch (innerText) {
+        case 'boys':
+            babyName.sex = BabySex.BOY;
+            break;
+        case 'girls':
+            babyName.sex = BabySex.GIRL;
+            break;
+        default:
+            babyName.sex = BabySex.UNISEX;
+            break;
+    }
 };
-const handleChooseType = (event: any) => {
-    babyName.type = event.target?.innerText.toLowerCase();
+const handleChooseType = (event: IButtonEvent) => {
+    const innerText = event?.target?.innerText.toLowerCase();
+    switch (innerText) {
+        case 'trendy':
+            babyName.type = NameType.TRENDY;
+            break;
+        default:
+            babyName.type = NameType.UNIQUE;
+            break;
+    }
 };
-const handleChooseLength = (event: any) => {
-    babyName.length = event.target?.innerText.toLowerCase();
+const handleChooseLength = (event: IButtonEvent) => {
+    const innerText = event?.target?.innerText.toLowerCase();
+    switch (innerText) {
+        case 'all':
+            babyName.length = NameLength.ALL;
+            break;
+        case 'short':
+            babyName.length = NameLength.SHORT;
+            break;
+        default:
+            babyName.length = NameLength.LONG;
+            break;
+    }
 };
 const showBabyName = () => {
-    console.log(babyName);
+    babiesName.value = [...names]
+        .filter(({ gender }) => gender === babyName.sex)
+        .filter(({ length }) => {
+            if (babyName.length === NameLength.ALL) return true;
+            else return length === babyName.length;
+        })
+        .filter(({ popularity }) => popularity === babyName.type);
+};
+const removeName = (babyId: number) => {
+    babiesName.value = babiesName.value.filter(({ id }) => id !== babyId);
 };
 </script>
 <template>
@@ -50,7 +87,8 @@ const showBabyName = () => {
                         <button
                             @click="handleChooseSex"
                             :class="{
-                                'text-white bg-red-500': babyName.sex == 'boys',
+                                'text-white bg-red-500':
+                                    babyName.sex === BabySex.BOY,
                             }"
                         >
                             boys
@@ -60,7 +98,7 @@ const showBabyName = () => {
                             class="border-x-[3px] border-red-500"
                             :class="{
                                 'text-white bg-red-500':
-                                    babyName.sex == 'unisex',
+                                    babyName.sex === BabySex.UNISEX,
                             }"
                         >
                             unisex
@@ -69,7 +107,7 @@ const showBabyName = () => {
                             @click="handleChooseSex"
                             :class="{
                                 'text-white bg-red-500':
-                                    babyName.sex == 'girls',
+                                    babyName.sex === BabySex.GIRL,
                             }"
                         >
                             girls
@@ -152,7 +190,15 @@ const showBabyName = () => {
                     Find names
                 </button>
             </div>
-            {{}}
+        </section>
+        <section class="p-5 flex">
+            <name-card
+                v-for="{ name, id } in babiesName"
+                :key="id"
+                :name="name"
+                :id="id"
+                @remove-baby="removeName"
+            />
         </section>
     </main>
 </template>
