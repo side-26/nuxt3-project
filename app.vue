@@ -2,7 +2,7 @@
 import { IBabyName, IButtonEvent, IBabiesName } from '@/config/types';
 import { BabySex, NameLength, NameType } from '@/config/enums';
 import { names } from '@/config/data';
-
+import { babyNameItem } from '@/config/optionSectionData';
 const babyName = reactive<IBabyName>({
     sex: BabySex.BOY,
     type: NameType.TRENDY,
@@ -10,45 +10,6 @@ const babyName = reactive<IBabyName>({
 });
 // set a interface for event
 const babiesName = ref<IBabiesName[]>([]);
-const handleChooseSex = (event: IButtonEvent) => {
-    const innerText = event?.target?.innerText.toLowerCase();
-    switch (innerText) {
-        case 'boys':
-            babyName.sex = BabySex.BOY;
-            break;
-        case 'girls':
-            babyName.sex = BabySex.GIRL;
-            break;
-        default:
-            babyName.sex = BabySex.UNISEX;
-            break;
-    }
-};
-const handleChooseType = (event: IButtonEvent) => {
-    const innerText = event?.target?.innerText.toLowerCase();
-    switch (innerText) {
-        case 'trendy':
-            babyName.type = NameType.TRENDY;
-            break;
-        default:
-            babyName.type = NameType.UNIQUE;
-            break;
-    }
-};
-const handleChooseLength = (event: IButtonEvent) => {
-    const innerText = event?.target?.innerText.toLowerCase();
-    switch (innerText) {
-        case 'all':
-            babyName.length = NameLength.ALL;
-            break;
-        case 'short':
-            babyName.length = NameLength.SHORT;
-            break;
-        default:
-            babyName.length = NameLength.LONG;
-            break;
-    }
-};
 const showBabyName = () => {
     babiesName.value = [...names]
         .filter(({ gender }) => gender === babyName.sex)
@@ -78,110 +39,12 @@ const removeName = (babyId: number) => {
         <section
             class="rounded-3xl bg-pink-300 p-10 flex justify-center items-center flex-col text-center"
         >
-            <div class="my-4">
-                <section class="">
-                    <div class="mb-4 font-medium">1) choose a gender</div>
-                    <div
-                        class="rounded-3xl border-[3px] border-red-500 overflow-hidden [&_button]:capitalize [&_button]:border-red-500 [&_button]:py-2 [&_button]:px-7 [&_button]:text-xs [&_button]:font-medium w-fit bg-white"
-                    >
-                        <button
-                            @click="handleChooseSex"
-                            :class="{
-                                'text-white bg-red-500':
-                                    babyName.sex === BabySex.BOY,
-                            }"
-                        >
-                            boys
-                        </button>
-                        <button
-                            @click="handleChooseSex"
-                            class="border-x-[3px] border-red-500"
-                            :class="{
-                                'text-white bg-red-500':
-                                    babyName.sex === BabySex.UNISEX,
-                            }"
-                        >
-                            unisex
-                        </button>
-                        <button
-                            @click="handleChooseSex"
-                            :class="{
-                                'text-white bg-red-500':
-                                    babyName.sex === BabySex.GIRL,
-                            }"
-                        >
-                            girls
-                        </button>
-                    </div>
-                </section>
-            </div>
-            <div class="my-4">
-                <section>
-                    <div class="mb-4 font-medium">
-                        2) choose name's popularity
-                    </div>
-                    <div
-                        class="rounded-3xl border-[3px] border-red-500 overflow-hidden [&_button]:capitalize [&_button]:border-red-500 [&_button]:py-3 [&_button]:px-7 [&_button]:text-xs [&_button]:font-medium w-fit bg-white"
-                    >
-                        <button
-                            @click="handleChooseType"
-                            :class="{
-                                'text-white bg-red-500':
-                                    babyName.type === 'unique',
-                            }"
-                        >
-                            unique
-                        </button>
-                        <button
-                            @click="handleChooseType"
-                            class="border-l-[3px] border-red-500"
-                            :class="{
-                                'text-white bg-red-500':
-                                    babyName.type === 'trendy',
-                            }"
-                        >
-                            trendy
-                        </button>
-                    </div>
-                </section>
-            </div>
-            <div class="my-4">
-                <section>
-                    <div class="mb-4 font-medium">3) choose name's length</div>
-                    <div
-                        class="rounded-3xl border-[3px] border-red-500 overflow-hidden [&_button]:capitalize [&_button]:border-red-500 [&_button]:py-3 [&_button]:px-7 [&_button]:text-xs [&_button]:font-medium w-fit bg-white"
-                    >
-                        <button
-                            @click="handleChooseLength"
-                            :class="{
-                                'text-white bg-red-500':
-                                    babyName.length === 'long',
-                            }"
-                        >
-                            long
-                        </button>
-                        <button
-                            @click="handleChooseLength"
-                            class="border-x-[3px] border-red-500"
-                            :class="{
-                                'text-white bg-red-500':
-                                    babyName.length === 'all',
-                            }"
-                        >
-                            all
-                        </button>
-                        <button
-                            @click="handleChooseLength"
-                            :class="{
-                                'text-white bg-red-500':
-                                    babyName.length === 'short',
-                            }"
-                        >
-                            short
-                        </button>
-                    </div>
-                </section>
-            </div>
+            <options-section
+                v-for="{ id, ...item } in babyNameItem"
+                :key="id"
+                :options="{ id, ...item }"
+                :baby-name="babyName"
+            />
             <div class="mt-8">
                 <button
                     @click="showBabyName"
